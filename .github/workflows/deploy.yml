@@ -23,17 +23,5 @@ jobs:
           cache: npm
       - run: npm ci
 
-      # Find the notify-me database, creating it on the first deploy, and
-      # write its id into wrangler.toml for this run.
-      - name: Prepare D1 database
-        run: |
-          id=$(npx wrangler d1 list --json | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const db=JSON.parse(s).find(d=>d.name==='raiku-notify');process.stdout.write(db?db.uuid:'')})")
-          if [ -z "$id" ]; then
-            npx wrangler d1 create raiku-notify
-            id=$(npx wrangler d1 list --json | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{process.stdout.write(JSON.parse(s).find(d=>d.name==='raiku-notify').uuid)})")
-          fi
-          sed -i "s/^database_id = .*/database_id = \"$id\"/" wrangler.toml
-          npx wrangler d1 migrations apply raiku-notify --remote
-
-      - name: Deploy worker and site
+      - name: Deploy site
         run: npx wrangler deploy

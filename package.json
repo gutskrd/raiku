@@ -3,9 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "wrangler d1 migrations apply raiku-notify --local && wrangler dev",
-    "deploy": "wrangler d1 migrations apply raiku-notify --remote && wrangler deploy",
-    "subscribers": "wrangler d1 execute raiku-notify --remote --command \"SELECT email, datetime(created_at, 'unixepoch') AS joined FROM subscribers ORDER BY id\""
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
   },
   "devDependencies": {
     "wrangler": "^4.154.0"

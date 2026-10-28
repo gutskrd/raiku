@@ -134,7 +134,7 @@ function scheduleCountdown() {
 
 function goLive() {
   countdownEl.hidden = true;
-  $('#notify').hidden = true;
+  $('.hero-cta').hidden = true;
   $('#live').hidden = false;
   $('#live-link').href = CONFIG.liveUrl;
   $('.status-text').textContent = 'Season 0 · Live now';
@@ -148,155 +148,6 @@ function showLaunchTime() {
     weekday: 'short', day: 'numeric', month: 'short', year: 'numeric',
     hour: '2-digit', minute: '2-digit', timeZoneName: 'short',
   }).format(launchAt);
-}
-
-/* ── Notify form ───────────────────────────────────────────────── */
-
-const form = $('#notify');
-const emailInput = $('#email');
-const btn = $('#notify-btn');
-const msg = $('#notify-msg');
-const field = $('.notify-field');
-const DEFAULT_MSG = msg.textContent;
-const STORAGE_KEY = 'raiku:notified';
-const EMAIL_RE = /^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,24}$/;
-
-const store = {
-  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
-  set(k, v) { try { localStorage.setItem(k, v); } catch { /* private mode */ } },
-};
-
-function setMessage(text, kind = '') {
-  msg.textContent = text;
-  msg.classList.toggle('is-ok', kind === 'ok');
-  msg.classList.toggle('is-err', kind === 'err');
-}
-
-function markJoined() {
-  btn.classList.add('is-done');
-  btn.querySelector('.btn-label').textContent = "You're in ✓";
-  emailInput.disabled = true;
-  emailInput.placeholder = 'On the list';
-}
-
-function flagError(text) {
-  setMessage(text, 'err');
-  field.classList.remove('has-error');
-  void field.offsetWidth;
-  field.classList.add('has-error');
-}
-
-function countUp(el, to) {
-  const t0 = performance.now();
-  const dur = reducedMotion ? 1 : 1400;
-  const step = (now) => {
-    const p = Math.min((now - t0) / dur, 1);
-    el.textContent = Math.round(to * (1 - Math.pow(1 - p, 3))).toLocaleString();
-    if (p < 1) requestAnimationFrame(step);
-  };
-  requestAnimationFrame(step);
-}
-
-function showCount(count) {
-  if (!Number.isFinite(count) || count < CONFIG.showCountFrom) return;
-  const el = $('#notify-count');
-  el.hidden = false;
-  el.innerHTML = '<span class="pulse" aria-hidden="true"></span><span><b>0</b> players in line</span>';
-  countUp(el.querySelector('b'), count);
-}
-
-async function loadCount() {
-  try {
-    const res = await fetch(CONFIG.notifyEndpoint, { headers: { Accept: 'application/json' } });
-    if (!res.ok) return;
-    showCount((await res.json()).count);
-  } catch { /* the count is decoration; stay quiet */ }
-}
-
-function setupForm() {
-  if (!CONFIG.notifyEndpoint) {
-    form.hidden = true;
-    return;
-  }
-  if (store.get(STORAGE_KEY)) {
-    markJoined();
-    setMessage("You're on the list. We'll email you the moment doors open.", 'ok');
-  }
-  loadCount();
-
-  emailInput.addEventListener('input', () => {
-    if (msg.classList.contains('is-err')) {
-      field.classList.remove('has-error');
-      setMessage(DEFAULT_MSG);
-    }
-  });
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (btn.classList.contains('is-loading') || btn.classList.contains('is-done')) return;
-    const email = emailInput.value.trim();
-    if (!EMAIL_RE.test(email)) {
-      flagError('Enter a full email address, like you@email.com.');
-      emailInput.focus();
-      return;
-    }
-
-    btn.classList.add('is-loading');
-    btn.setAttribute('aria-busy', 'true');
-    try {
-      const res = await fetch(CONFIG.notifyEndpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ email, company: form.company.value }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.status === 429) throw new Error('Too many tries from this network. Give it a few minutes.');
-      if (res.status === 400) throw new Error('That email does not look right. Check it and try again.');
-      if (!res.ok) throw new Error("We couldn't reach the list just now. Try again in a moment.");
-
-      store.set(STORAGE_KEY, '1');
-      markJoined();
-      setMessage(data.already
-        ? "You're already on the list. We'll email you the moment doors open."
-        : "You're on the list. We'll email you the moment doors open.", 'ok');
-      burst(btn);
-      if (data.count) showCount(data.count);
-    } catch (err) {
-      flagError(err instanceof TypeError
-        ? "We couldn't reach the list just now. Try again in a moment."
-        : err.message);
-    } finally {
-      btn.classList.remove('is-loading');
-      btn.removeAttribute('aria-busy');
-    }
-  });
-}
-
-function burst(origin) {
-  if (reducedMotion) return;
-  const r = origin.getBoundingClientRect();
-  const cx = r.left + r.width / 2;
-  const cy = r.top + r.height / 2;
-  const colors = ['#b47bff', '#8a2bf6', '#ffffff', '#d32ce6', '#ffd24a'];
-  for (let i = 0; i < 34; i++) {
-    const s = document.createElement('span');
-    s.className = 'spark';
-    s.style.left = `${cx}px`;
-    s.style.top = `${cy}px`;
-    s.style.setProperty('--c', colors[i % colors.length]);
-    const size = 4 + Math.random() * 6;
-    s.style.width = s.style.height = `${size}px`;
-    document.body.appendChild(s);
-    const angle = Math.random() * Math.PI * 2;
-    const dist = 60 + Math.random() * 160;
-    const dx = Math.cos(angle) * dist;
-    const dy = Math.sin(angle) * dist - 40;
-    s.animate([
-      { transform: 'translate(-50%, -50%) rotate(45deg) scale(1)', opacity: 1 },
-      { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy + 80}px)) rotate(${225 + Math.random() * 180}deg) scale(.2)`, opacity: 0 },
-    ], { duration: 900 + Math.random() * 600, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'forwards' })
-      .finished.then(() => s.remove());
-  }
 }
 
 /* ── Vault spotlight & rail ────────────────────────────────────── */
@@ -444,21 +295,8 @@ function setupVault() {
 
 /* ── Discord ───────────────────────────────────────────────────── */
 
-async function setupDiscord() {
+function setupDiscord() {
   $$('.js-discord').forEach((a) => { a.href = CONFIG.discordUrl; });
-  if (!CONFIG.discordStatsEndpoint) return;
-  try {
-    const res = await fetch(CONFIG.discordStatsEndpoint, { headers: { Accept: 'application/json' } });
-    if (!res.ok) return;
-    const { members, online } = await res.json();
-    if (!Number.isFinite(members) || members <= 0) return;
-    const el = $('#discord-stats');
-    el.innerHTML = '<span class="pulse pulse--online" aria-hidden="true"></span>' +
-      `<span>${Number.isFinite(online) ? '<b data-n="online">0</b> online · ' : ''}<b data-n="members">0</b> members</span>`;
-    el.hidden = false;
-    if (Number.isFinite(online)) countUp($('[data-n="online"]', el), online);
-    countUp($('[data-n="members"]', el), members);
-  } catch { /* counts are optional */ }
 }
 
 /* ── Header, reveals & pointer effects ─────────────────────────── */
@@ -558,7 +396,6 @@ function setupCrownMode() {
 
 showLaunchTime();
 scheduleCountdown();
-setupForm();
 setupVault();
 setupDiscord();
 setupHeader();

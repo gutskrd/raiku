@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>raiku.win · CS2 cases & case battles · Launching soon</title>
-  <meta name="description" content="raiku.win is the new home for CS2 case openings, case battles and upgrades. Provably fair from the first roll. Get notified the moment doors open.">
+  <meta name="description" content="raiku.win is the new home for CS2 case openings, case battles and upgrades. Provably fair from the first roll. Doors open soon.">
   <meta name="theme-color" content="#05030a">
   <meta name="color-scheme" content="dark">
 
@@ -17,7 +17,7 @@
   <meta property="og:site_name" content="raiku.win">
   <meta property="og:url" content="https://raiku.win/">
   <meta property="og:title" content="raiku.win · Launching soon">
-  <meta property="og:description" content="CS2 cases, case battles and upgrades. Provably fair. Get notified when the doors open.">
+  <meta property="og:description" content="CS2 cases, case battles and upgrades. Provably fair. Doors open soon.">
   <meta property="og:image" content="https://raiku.win/assets/img/og.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -48,8 +48,6 @@
     <div class="intro-bar"><span id="intro-fill"></span></div>
     <p class="intro-label">Forging the crown <span id="intro-pct">0</span>%</p>
   </div>
-
-  <a class="skip" href="#email">Skip to sign-up</a>
 
   <header class="top" id="top">
     <a class="brand" href="#" aria-label="raiku.win, back to top">
@@ -109,17 +107,13 @@
         <a class="btn btn--lg" id="live-link" href="/"><span class="btn-label">Enter raiku.win</span></a>
       </div>
 
-      <form class="notify reveal" style="--i:5" id="notify" novalidate>
-        <div class="notify-field">
-          <label for="email" class="sr-only">Email address</label>
-          <svg class="notify-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v12H4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="m4.5 6.5 7.5 6 7.5-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-          <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com" maxlength="254" required>
-          <input class="hp" name="company" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
-          <button class="btn" type="submit" id="notify-btn"><span class="btn-label">Notify me</span></button>
-        </div>
-        <p class="notify-msg" id="notify-msg" role="status" aria-live="polite">First access to the closed beta. One email when doors open, no spam.</p>
-        <p class="notify-count" id="notify-count" hidden></p>
-      </form>
+      <div class="hero-cta reveal" style="--i:5">
+        <a class="btn btn--lg js-discord" href="#" target="_blank" rel="noopener">
+          <svg class="i-discord" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-discord"/></svg>
+          <span class="btn-label">Join the Discord</span>
+        </a>
+        <p class="hero-note">Launch news lands in the Discord first.</p>
+      </div>
 
       <a class="scroll-cue reveal" style="--i:6" href="#vault">
         <span>Scroll</span><i aria-hidden="true"></i>
@@ -212,7 +206,6 @@
                 <svg class="i-discord" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-discord"/></svg>
                 <span class="btn-label">Join the Discord</span>
               </a>
-              <p class="band-stats" id="discord-stats" hidden></p>
             </div>
           </div>
         </div>

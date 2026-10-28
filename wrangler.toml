@@ -1,5 +1,4 @@
 name = "raiku-win"
-main = "worker/index.js"
 compatibility_date = "2026-09-01"
 
 # Serves the site on raiku.win. The raiku.win zone must be in the same
@@ -9,19 +8,7 @@ routes = [
   { pattern = "www.raiku.win", custom_domain = true },
 ]
 
+# Static site only: no server code, no database.
 [assets]
 directory = "./public"
-binding = "ASSETS"
 not_found_handling = "single-page-application"
-run_worker_first = ["/api/*"]
-
-[vars]
-DISCORD_INVITE = "U9ms8sXgRf"
-
-[[d1_databases]]
-binding = "DB"
-database_name = "raiku-notify"
-# The deploy workflow fills this in. For a manual deploy, use the id printed
-# by `npx wrangler d1 create raiku-notify`.
-database_id = "00000000-0000-0000-0000-000000000000"
-migrations_dir = "worker/migrations"
