@@ -26,10 +26,10 @@ async function runIntro() {
       document.fonts ? document.fonts.ready : null,
       ...heroImages.map((img) => (img.decode ? img.decode().catch(() => {}) : null)),
     ]),
-    new Promise((r) => setTimeout(r, 2500)),
+    new Promise((r) => setTimeout(r, 1200)),
   ]);
 
-  const minDuration = reducedMotion ? 0 : 1100;
+  const minDuration = reducedMotion ? 0 : 650;
   const t0 = performance.now();
   let ready = false;
   assetsReady.then(() => { ready = true; });
